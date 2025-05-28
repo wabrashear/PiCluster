@@ -25,8 +25,8 @@ def index_to_string(index, base_chars, length):
 	chars = []
 	base = len(base_chars)
 	for _ in range(length):
-    	index, rem = divmod(index, base)
-    	chars.append(base_chars[rem])
+		index, rem = divmod(index, base)
+		chars.append(base_chars[rem])
 	return ''.join(reversed(chars))
 
 # ----- WORK DIVISION -----
@@ -47,20 +47,20 @@ for idx in range(start_index, end_index):
 	# Cooperative check: has anyone found the password?
 	found_flag = comm.allreduce(1 if found else 0, op=MPI.SUM)
 	if found_flag > 0:
-    	break
+		break
 
 	guess = index_to_string(idx, CHARSET, LENGTH)
 	if guess == PASSWORD:
-    	found = guess
-    	print(f"[Rank {rank}] Found the password: {found}")
-    	total_time = time.time() - start_time
-    	print(f"[Rank {rank}] Time taken: {total_time:.4f} seconds")
-    	break
+		found = guess
+		print(f"[Rank {rank}] Found the password: {found}")
+		total_time = time.time() - start_time
+		print(f"[Rank {rank}] Time taken: {total_time:.4f} seconds")
+		break
 
 	# Progress printing every N guesses
 	if idx % progress_interval == 0:
-    	percent = ((idx - start_index) / (end_index - start_index)) * 100
-    	print(f"[Rank {rank}] Progress: {percent:.2f}%")
+		percent = ((idx - start_index) / (end_index - start_index)) * 100
+		print(f"[Rank {rank}] Progress: {percent:.2f}%")
 
 comm.Barrier()
 
