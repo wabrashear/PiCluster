@@ -8,10 +8,14 @@ rank = comm.Get_rank()
 size = comm.Get_size()
 
 # ----- USER CONFIG -----
-if rank == 0:
-	PASSWORD = input("Enter the password to crack (fixed length): ").strip()
-else:
-	PASSWORD = None
+try:
+    PASSWORD = input("Enter the password to crack (fixed length): ").strip()
+    if not PASSWORD:
+        raise ValueError("Empty password")
+except Exception as e:
+    print(f"[Rank 0] Failed to get password input: {e}")
+    sys.exit(1)
+
 
 PASSWORD = comm.bcast(PASSWORD, root=0)
 
