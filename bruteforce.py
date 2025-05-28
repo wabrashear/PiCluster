@@ -2,6 +2,7 @@
 from mpi4py import MPI
 import time
 import string
+import sys
 
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
