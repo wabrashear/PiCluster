@@ -7,7 +7,6 @@ comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
 
-# Parse password from CLI argument
 if len(sys.argv) != 2:
     if rank == 0:
         print("Usage: python3 bruteforce.py <password>")
@@ -39,17 +38,13 @@ start_index = rank * chunk_size
 end_index = total_combinations if rank == size - 1 else start_index + chunk_size
 
 found = False
-progress_interval = 1000
-found_global = False
+progress_interval = 10_000
 
 for idx in range(start_index, end_index):
-    # Periodically check if another rank found it
-    if idx % progress_interval == 0 and not found:
-        # Use non-blocking check across all ranks
-        local_flag = 1 if found else 0
-        global_flag = comm.allreduce(local_flag, op=MPI.SUM)
-        if global_flag > 0:
-            break
+    # Check if anyone has found the password (every iteration)
+    global_flag = comm.allreduce(1 if found else 0, op=MPI.SUM)
+    if global_flag > 0:
+        break
 
     guess = index_to_string(idx, CHARSET, LENGTH)
     if guess == PASSWORD:
@@ -58,6 +53,7 @@ for idx in range(start_index, end_index):
         print(f"[Rank {rank}] Time taken: {time.time() - start_time:.4f} seconds")
         break
 
+    # Print progress every 10,000 attempts
     if idx % progress_interval == 0:
         percent = ((idx - start_index) / (end_index - start_index)) * 100
         print(f"[Rank {rank}] Progress: {percent:.2f}%")
