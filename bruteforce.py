@@ -10,7 +10,8 @@ size = comm.Get_size()
 # Only rank 0 prompts for input
 if rank == 0:
     try:
-        PASSWORD = input("Enter the password to crack (fixed length): ").strip()
+        print("Enter the password to crack (fixed length): ", end='', flush=True)
+        PASSWORD = input().strip()
         if not PASSWORD:
             raise ValueError("Empty password entered")
     except Exception as e:
@@ -48,7 +49,9 @@ found = None
 progress_interval = 100000
 
 for idx in range(start_index, end_index):
-    if comm.allreduce(1 if found else 0, op=MPI.SUM) > 0:
+    if found:
+        break
+    if any(comm.allgather(found)):
         break
 
     guess = index_to_string(idx, CHARSET, LENGTH)
