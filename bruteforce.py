@@ -54,8 +54,8 @@ for idx in range(start_index, end_index):
 
     if guess == PASSWORD:
         found_flag = 1
-        print(f"[Rank {rank}] ✅ Found the password: {guess}")
-        print(f"[Rank {rank}] ⏱️ Time taken: {time.time() - start_time:.4f} seconds")
+        print(f"[Rank {rank}] Found the password: {guess}")
+        print(f"[Rank {rank}] Time taken: {time.time() - start_time:.4f} seconds")
         break
 
     if idx % progress_interval == 0:
