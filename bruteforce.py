@@ -6,7 +6,7 @@ import sys
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
-print("Enter the password to crack (fixed length): ", end='', flush=True)
+print("Enter the password to crack (fixed length): ", end='')
 
 
 # Only rank 0 prompts for input
