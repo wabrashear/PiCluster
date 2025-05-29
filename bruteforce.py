@@ -39,7 +39,7 @@ start_index = rank * chunk_size
 end_index = total_combinations if rank == size - 1 else start_index + chunk_size
 
 found = False
-progress_interval = 100000
+progress_interval = 1000
 found_global = False
 
 for idx in range(start_index, end_index):
