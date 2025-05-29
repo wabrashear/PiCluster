@@ -9,8 +9,8 @@ size = comm.Get_size()
 
 # Only rank 0 prompts for input
 if rank == 0:
+    print("Enter the password to crack (fixed length): ", end='', flush=True)
     try:
-        print("Enter the password to crack (fixed length): ", end='', flush=True)
         PASSWORD = input().strip()
         if not PASSWORD:
             raise ValueError("Empty password entered")
