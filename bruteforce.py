@@ -6,25 +6,17 @@ import sys
 comm = MPI.COMM_WORLD
 rank = comm.Get_rank()
 size = comm.Get_size()
-print("Enter the password to crack (fixed length): ", end='')
 
+# Parse password from CLI argument
+if len(sys.argv) != 2:
+    if rank == 0:
+        print("Usage: python3 bruteforce.py <password>")
+    sys.exit(1)
 
-# Only rank 0 prompts for input
-if rank == 0:
-    try:
-        PASSWORD = input().strip()
-        if not PASSWORD:
-            raise ValueError("Empty password entered")
-    except Exception as e:
-        print(f"[Rank 0] Error reading input: {e}")
-        PASSWORD = None
-else:
-    PASSWORD = None
-
-# Broadcast password to all ranks
+PASSWORD = sys.argv[1] if rank == 0 else None
 PASSWORD = comm.bcast(PASSWORD, root=0)
 
-if PASSWORD is None:
+if not PASSWORD:
     if rank == 0:
         print("No valid password provided. Exiting.")
     sys.exit(1)
@@ -46,19 +38,23 @@ chunk_size = total_combinations // size
 start_index = rank * chunk_size
 end_index = total_combinations if rank == size - 1 else start_index + chunk_size
 
-found = None
+found = False
 progress_interval = 100000
+found_global = False
 
 for idx in range(start_index, end_index):
-    if found:
-        break
-    if any(comm.allgather(found)):
-        break
+    # Periodically check if another rank found it
+    if idx % progress_interval == 0 and not found:
+        # Use non-blocking check across all ranks
+        local_flag = 1 if found else 0
+        global_flag = comm.allreduce(local_flag, op=MPI.SUM)
+        if global_flag > 0:
+            break
 
     guess = index_to_string(idx, CHARSET, LENGTH)
     if guess == PASSWORD:
-        found = guess
-        print(f"[Rank {rank}] Found the password: {found}")
+        found = True
+        print(f"[Rank {rank}] Found the password: {guess}")
         print(f"[Rank {rank}] Time taken: {time.time() - start_time:.4f} seconds")
         break
 
