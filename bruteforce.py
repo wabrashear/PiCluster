@@ -64,4 +64,4 @@ for idx in range(start_index, end_index):
 comm.Barrier()
 
 if rank == 0:
-    print(f"🔚 Search completed across {size} processes in {time.time() - start_time:.4f} seconds.")
+    print(f"Search completed across {size} processes in {time.time() - start_time:.4f} seconds.")
